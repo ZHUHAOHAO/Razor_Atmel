@@ -40,7 +40,18 @@ the 1ms period.
 ***********************************************************************************************************************/
 
 void main(void)
-{
+{typedef struct
+{u8 u8Counter;
+void *pNextTestStructType;
+}TestStructType;
+TestStructType s1;
+TestStructType s2;
+s1.u8Counter=1;
+s1.pNextTestStructType=&s2;
+s2.u8Counter=2;
+s2.pNextTestStructType=NULL;
+ 
+
   G_u32SystemFlags |= _SYSTEM_INITIALIZING;
 
   /* Low level initialization */
