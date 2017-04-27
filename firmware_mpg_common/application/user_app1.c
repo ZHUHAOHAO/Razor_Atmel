@@ -136,34 +136,39 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u32 u32Counter1=0,u32Counter2=0,u32Counter5=0,u32Counter3=COUNTER_MS,u32Counter4=COUNTER_MS1;
-  static bool bLight=TRUE;
-  if(u32Counter1%10==u32Counter2)
-  {
-    if(bLight==TRUE)
-       HEARTBEAT_OFF();
+  static u32 u32Counter1=0,u32Counter2=0,u32Counter3=0;
+  static bool bLight=FALSE;
+  u32Counter1++;
+  u32Counter3++;
+  if(u32Counter3==u32Counter2+1)
+    if(u32Counter2!=10)
+      HEARTBEAT_OFF();
     else
+       HEARTBEAT_ON();
+  if(u32Counter3==11)
+  {
+    u32Counter3=0;
+    if(u32Counter2!=0)
       HEARTBEAT_ON();
   }
-  u32Counter5++;
-  if(u32Counter5==u32Counter4-u32Counter2)
-  {
-    u32Counter5=0;
-    if(bLight==TRUE)
-      HEARTBEAT_ON();
-    else
-      HEARTBEAT_OFF();
-  }  
-      u32Counter1++;
-   if(u32Counter1==u32Counter3)
-      {
-        u32Counter2++;
-      }
-   if(u32Counter2==u32Counter4)
-      {
-        u32Counter2=0;
-        bLight=!bLight;
-      } 
+   if(u32Counter2==0)
+     bLight=FALSE;
+   if(u32Counter1==100)
+   {
+     u32Counter1=0;
+     if(bLight==FALSE)
+       u32Counter2++;
+     else
+       u32Counter2--;
+   }
+   if(u32Counter2==10)
+   {
+     bLight=!bLight;
+     if(bLight==FALSE)
+       u32Counter2++;
+     else
+       u32Counter2--; 
+   }
 } /* end UserApp1SM_Idle() */
     
 #if 0
