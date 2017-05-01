@@ -87,7 +87,15 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(BLUE);
+  LedOff(CYAN);
+  LedOff(GREEN);
+  LedOff(YELLOW);
+  LedOff(ORANGE);
+  LedOff(RED);
+  
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -98,7 +106,6 @@ void UserApp1Initialize(void)
     /* The task isn't properly initialized, so shut it down and don't run */
     UserApp1_StateMachine = UserApp1SM_FailedInit;
   }
-
 } /* end UserApp1Initialize() */
 
   
@@ -126,8 +133,7 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-
-
+ 
 /**********************************************************************************************************************
 State Machine Function Definitions
 **********************************************************************************************************************/
@@ -135,40 +141,70 @@ State Machine Function Definitions
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
-{
-  static u32 u32Counter1=0,u32Counter2=0,u32Counter3=0;
-  static bool bLight=FALSE;
-  u32Counter1++;
-  u32Counter3++;
-  if(u32Counter3==u32Counter2+1)
-    if(u32Counter2!=10)
-      HEARTBEAT_OFF();
-    else
-       HEARTBEAT_ON();
-  if(u32Counter3==11)
+{ 
+  LedOff(RED);
+  static u8 u8aNumber[]={9,9,9,9,9,9},u8aNumber1[]={2,2,3,3,4,4};
+  static u8 u8Counter1=0;
+  u8 u8Judge=1;
+  static u8 u8Shuzhi;
+  u8 u8Index;
+  u8 u8aButtonValue=0;
+  if(WasButtonPressed(BUTTON0))
   {
-    u32Counter3=0;
-    if(u32Counter2!=0)
-      HEARTBEAT_ON();
+    ButtonAcknowledge(BUTTON0);
+    u8aButtonValue=1;
+    LedOn(RED);
   }
-   if(u32Counter2==0)
-     bLight=FALSE;
-   if(u32Counter1==100)
-   {
-     u32Counter1=0;
-     if(bLight==FALSE)
-       u32Counter2++;
-     else
-       u32Counter2--;
+  
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    u8aButtonValue=2;
+    LedOn(RED);
+  }
+  
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    u8aButtonValue=3;
+    LedOn(RED);
+  }
+  
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    u8aButtonValue=4;
+    LedOn(RED);
+  }
+  u8Shuzhi=u8aButtonValue;
+  if(u8aButtonValue!=0)
+  {
+    u8aNumber[u8Counter1]=u8Shuzhi;
+    u8Counter1++; 
+  }
+   if(u8Counter1==6)
+   { 
+     u8Counter1=0;
+     for(u8Index=0;u8Index<6;u8Index++)
+     {
+      if(u8aNumber[u8Index]!=u8aNumber1[u8Index])
+      {
+        u8Judge=0;
+        break;
+      }
+     }
+     if(u8Judge)
+      {
+       LedOn(WHITE);
+       LedOff(PURPLE);
+      }
+      else
+      {
+       LedOn(PURPLE);
+       LedOff(WHITE);
+      } 
    }
-   if(u32Counter2==10)
-   {
-     bLight=!bLight;
-     if(bLight==FALSE)
-       u32Counter2++;
-     else
-       u32Counter2--; 
-   }
+  
 } /* end UserApp1SM_Idle() */
     
 #if 0
