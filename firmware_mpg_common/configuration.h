@@ -229,12 +229,13 @@ The order of the definitions below must match the order of the definitions provi
 */
 
 #ifdef MPGL1
-#define TOTAL_BUTTONS         (u8)4       /* Total number of Buttons in the system */
+#define TOTAL_BUTTONS         (u8)4      /* Total number of Buttons in the system */
 
 #define BUTTON0               (u32)0
 #define BUTTON1               (u32)1
 #define BUTTON2               (u32)2
 #define BUTTON3               (u32)3
+
 
 /* All buttons on each port must be ORed together here: set to 0 if no buttons on the port */
 #define GPIOA_BUTTONS         (u32)( PA_17_BUTTON0 )

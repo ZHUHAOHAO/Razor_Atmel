@@ -106,6 +106,7 @@ void UserApp1Initialize(void)
     /* The task isn't properly initialized, so shut it down and don't run */
     UserApp1_StateMachine = UserApp1SM_FailedInit;
   }
+  
 } /* end UserApp1Initialize() */
 
   
@@ -133,7 +134,31 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
- 
+ static u8 GetButtonValue(void)
+ {
+   u8 u8aButtonValue=0;
+  if(WasButtonPressed(BUTTON0))
+    {
+      ButtonAcknowledge(BUTTON0);
+      u8aButtonValue=1;
+    }  
+  if(WasButtonPressed(BUTTON1))
+    {
+      ButtonAcknowledge(BUTTON1);
+      u8aButtonValue=2;
+    }  
+  if(WasButtonPressed(BUTTON2))
+    {
+      ButtonAcknowledge(BUTTON2);
+      u8aButtonValue=3;
+    }  
+  if(WasButtonPressed(BUTTON3))
+    {
+      ButtonAcknowledge(BUTTON3);
+      u8aButtonValue=4;
+    }  
+  return u8aButtonValue;
+ }
 /**********************************************************************************************************************
 State Machine Function Definitions
 **********************************************************************************************************************/
@@ -142,69 +167,89 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 { 
-  LedOff(RED);
-  static u8 u8aNumber[]={9,9,9,9,9,9},u8aNumber1[]={2,2,3,3,4,4};
-  static u8 u8Counter1=0;
-  u8 u8Judge=1;
-  static u8 u8Shuzhi;
+  static u8 u8aPasswords[100],u8aPasswords1[100];
+  static u8 u8Counter=0,u8Counter1=0,u8GetNumber=0,u8GetNumber1=0;
   u8 u8Index;
-  u8 u8aButtonValue=0;
-  if(WasButtonPressed(BUTTON0))
-  {
-    ButtonAcknowledge(BUTTON0);
-    u8aButtonValue=1;
-    LedOn(RED);
-  }
+  u8 u8Judge=1;
+  static u8 u8JudgeNumber=0;
   
-  if(WasButtonPressed(BUTTON1))
+  if(IsButtonHeld(BUTTON3,1000))
+    {
+     LedOff(GREEN);
+     LedOff(RED);
+     LedBlink(GREEN,LED_2HZ);
+     LedBlink(RED,LED_2HZ);
+     u8JudgeNumber=1;
+    }
+  if(u8JudgeNumber==1)
+    {
+     u8GetNumber=GetButtonValue();
+      if(u8GetNumber!=0)
+       {
+        if(u8GetNumber!=4)
+        {
+         u8aPasswords[u8Counter]=u8GetNumber;
+         u8Counter++;
+        }
+        if(u8Counter!=0)
+        {
+         if(u8GetNumber==4)
+         {
+          LedOff(GREEN);
+          LedOff(RED);
+          LedOn(RED);
+          u8JudgeNumber=2;
+          u8Counter1=u8Counter;
+          u8Counter=0;
+         }
+        }
+       } 
+    }
+  if(u8JudgeNumber==2)
   {
-    ButtonAcknowledge(BUTTON1);
-    u8aButtonValue=2;
-    LedOn(RED);
-  }
-  
-  if(WasButtonPressed(BUTTON2))
-  {
-    ButtonAcknowledge(BUTTON2);
-    u8aButtonValue=3;
-    LedOn(RED);
-  }
-  
-  if(WasButtonPressed(BUTTON3))
-  {
-    ButtonAcknowledge(BUTTON3);
-    u8aButtonValue=4;
-    LedOn(RED);
-  }
-  u8Shuzhi=u8aButtonValue;
-  if(u8aButtonValue!=0)
-  {
-    u8aNumber[u8Counter1]=u8Shuzhi;
-    u8Counter1++; 
-  }
-   if(u8Counter1==6)
-   { 
-     u8Counter1=0;
-     for(u8Index=0;u8Index<6;u8Index++)
+   u8GetNumber1=GetButtonValue();
+   if(u8GetNumber1!=0)
+    {
+      if(u8GetNumber1!=4)
+      {
+        u8aPasswords1[u8Counter]=u8GetNumber1;
+        u8Counter++;
+      }
+    }
+   
+   if(u8GetNumber1==4)
+    {
+     if(u8Counter==u8Counter1) 
      {
-      if(u8aNumber[u8Index]!=u8aNumber1[u8Index])
-      {
-        u8Judge=0;
-        break;
-      }
+       u8Counter=0;
+       for(u8Index=0;u8Index<u8Counter1;u8Index++)
+       {
+        if(u8aPasswords1[u8Index]!=u8aPasswords[u8Index])
+        {
+          u8Judge=0;
+          break;
+        }
+       }
+     
+       if(u8Judge)
+       {    
+        LedBlink(GREEN,LED_2HZ);
+        LedOff(RED);
+       }
+       else
+       {
+        LedBlink(RED,LED_2HZ);
+        LedOff(GREEN);
+       }     
      }
-     if(u8Judge)
-      {
-       LedOn(WHITE);
-       LedOff(PURPLE);
-      }
-      else
-      {
-       LedOn(PURPLE);
-       LedOff(WHITE);
-      } 
-   }
-  
+     else
+     {
+      u8Counter=0;
+      LedBlink(RED,LED_2HZ);
+      LedOff(GREEN);
+     }
+    }
+  }
 } /* end UserApp1SM_Idle() */
     
 #if 0
