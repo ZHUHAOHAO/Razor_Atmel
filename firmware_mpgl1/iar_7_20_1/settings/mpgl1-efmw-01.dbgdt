@@ -82,7 +82,7 @@
           
           
           
-        <item>G_u32SystemTime1ms</item><item>G_u32SystemTime1s</item><item>i</item><item>u32Counter</item><item>bLight</item><item>u32Counter3</item><item>u32Counter2</item><item></item></expressions>
+        <item>G_u32SystemTime1ms</item><item>G_u32SystemTime1s</item><item>i</item><item>u32Counter</item><item>bLight</item><item>u32Counter3</item><item>u32Counter2</item><item/></expressions>
         <col-names>
           
           
@@ -116,7 +116,7 @@
       <WATCH_3>
         <expressions>
           
-        <item>u32Counter</item><item></item></expressions>
+        <item>u32Counter</item><item/></expressions>
         <col-names>
           
           

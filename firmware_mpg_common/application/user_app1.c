@@ -159,6 +159,7 @@ void UserApp1RunActiveState(void)
     }  
   return u8aButtonValue;
  }
+/*Create a function to get the button value*/
 /**********************************************************************************************************************
 State Machine Function Definitions
 **********************************************************************************************************************/
@@ -181,6 +182,7 @@ static void UserApp1SM_Idle(void)
      LedBlink(RED,LED_2HZ);
      u8JudgeNumber=1;
     }
+  /*Blink the red and green LED when user create their own password*/
   if(u8JudgeNumber==1)
     {
      u8GetNumber=GetButtonValue();
@@ -205,6 +207,7 @@ static void UserApp1SM_Idle(void)
         }
        } 
     }
+  /* Create a password and the red LED is on when locked*/
   if(u8JudgeNumber==2)
   {
    u8GetNumber1=GetButtonValue();
@@ -216,7 +219,7 @@ static void UserApp1SM_Idle(void)
         u8Counter++;
       }
     }
-   
+   /*enter your passwords*/
    if(u8GetNumber1==4)
     {
      if(u8Counter==u8Counter1) 
@@ -230,7 +233,7 @@ static void UserApp1SM_Idle(void)
           break;
         }
        }
-     
+     /*Check the input passwords is correct*/
        if(u8Judge)
        {    
         LedBlink(GREEN,LED_2HZ);
@@ -250,6 +253,7 @@ static void UserApp1SM_Idle(void)
      }
     }
   }
+  /*Blink red if the password is wrong,or blink green if correct until a button is pressed*/
 } /* end UserApp1SM_Idle() */
     
 #if 0
