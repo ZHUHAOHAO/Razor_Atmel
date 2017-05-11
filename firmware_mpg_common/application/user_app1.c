@@ -52,7 +52,7 @@ extern volatile u32 G_u32ApplicationFlags;             /* From main.c */
 extern volatile u32 G_u32SystemTime1ms;                /* From board-specific source file */
 extern volatile u32 G_u32SystemTime1s;                 /* From board-specific source file */
 
-
+extern u8 G_u8DebugScanfCharCount;
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
 Variable names shall start with "UserApp1_" and be declared as static.
@@ -136,6 +136,79 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  u8 u8InputValue[2]={10,10};
+  static u8 u8InputData[10];
+  static u8 u8StringInfor[]="*";
+  static u8 u8Index=0;
+  static u8 u8Index1=1;
+  u8 u8aMyName[]="zhuhao";
+  static bool bJudge=FALSE;
+  static u8 u8Counter1=0;
+  static u8 u8Counter2=0;
+  static u8 u8Counter3=0;  
+  static u8 u8Counter4=1;  
+  static u8 u8StringNumber=3; 
+  bool bJudge1=FALSE;
+  
+ 
+  DebugScanf(u8InputValue);
+  if(u8InputValue[0]!=10)
+    {   
+       u8InputData[u8Counter2]=u8InputValue[0];
+       u8Counter2++;
+    }
+  /*Input any keyword you want*/
+  if(u8Counter2==6)
+  {
+    u8Counter2=5;
+    u8InputData[6]='\0';
+    for(u8Index=0;u8Index<6;u8Index++)
+       {
+         if(u8InputData[u8Index]==u8aMyName[u8Index])
+          {
+           u8Counter3++;
+          }       
+         if(u8Counter3==6)
+          {
+            u8Counter2=0;
+            u8Counter3=0;
+            u8Counter1++;
+            bJudge1=TRUE;
+          }
+       }
+    u8Counter3=0;
+    /*Judge the words whether have your name*/
+    for(u8Index1=1;u8Index1<6;u8Index1++)
+      {
+        u8InputData[u8Index1-1]=u8InputData[u8Index1];   
+      }    
+  }
+  /*if do not find your name,go to the next*/
+  if( bJudge1==TRUE)
+    {
+      if(u8Counter1/u8Counter4==10)
+        {
+          u8Counter4=u8Counter1;
+          u8StringNumber++;
+        }
+      DebugPrintf("\n\r");
+      for(u8Index=0;u8Index<u8StringNumber;u8Index++)
+        {
+          DebugPrintf(u8StringInfor);
+        }
+      DebugPrintf("\n\r");
+      DebugPrintf(u8StringInfor);
+      DebugPrintNumber(u8Counter1);
+      DebugPrintf(u8StringInfor);
+      DebugPrintf("\n\r");
+      for(u8Index=0;u8Index<u8StringNumber;u8Index++)
+        {
+          DebugPrintf(u8StringInfor);
+        }  
+      DebugPrintf("\n\r");
+    } 
+  /*if find your name,do the work*/
+ 
 
 } /* end UserApp1SM_Idle() */
     
