@@ -175,7 +175,7 @@ static void UserApp1SM_Idle(void)
     LedOff(LCD_BLUE);
     LedOff(LCD_GREEN);
    }
-  /*Pressing the button and the LCD will change it's color*/
+ /*Pressing the button and the LCD will change it's color*/
   if(u8Counter1==100)
   {
     LedOn(RED);
