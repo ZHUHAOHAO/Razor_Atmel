@@ -87,7 +87,9 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+   LCDCommand(LCD_HOME_CMD);
+   LCDCommand(LCD_CLEAR_CMD);
+
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -136,7 +138,67 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-
+  static u8 u8Counter=LINE1_START_ADDR;
+  static u8 u8Counter1=0;
+  u8 au8Message[]="zhuhao";
+  u8Counter1++;
+  if(IsButtonPressed(BUTTON0)||IsButtonPressed(BUTTON1)||IsButtonPressed(BUTTON2)||IsButtonPressed(BUTTON3))
+   {
+     PWMAudioSetFrequency(BUZZER1,262);
+     PWMAudioOn(BUZZER1);
+   }
+  else
+   {
+     PWMAudioOff(BUZZER1);
+   }
+  /*if any button pressed,the buzzer will be on*/
+  if(WasButtonPressed(BUTTON0))
+   {
+    ButtonAcknowledge(BUTTON0);
+    LedOn(LCD_RED);
+   }
+  if(WasButtonPressed(BUTTON1))
+   {
+    ButtonAcknowledge(BUTTON1);
+    LedOn(LCD_BLUE);
+   }
+  
+  if(WasButtonPressed(BUTTON2))
+   {
+    ButtonAcknowledge(BUTTON2);
+    LedOn(LCD_GREEN);
+   }
+  if(WasButtonPressed(BUTTON3))
+   {
+    ButtonAcknowledge(BUTTON3);
+    LedOff(LCD_RED);
+    LedOff(LCD_BLUE);
+    LedOff(LCD_GREEN);
+   }
+  /*Pressing the button and the LCD will change it's color*/
+  if(u8Counter1==100)
+  {
+    LedOn(RED);
+    LedOn(WHITE);
+    LedOn(BLUE);
+    LedOn(YELLOW);
+  }
+  if(u8Counter1==250)
+  {
+    u8Counter1=0;
+    u8Counter++;
+    LedOff(RED);
+    LedOff(WHITE);
+    LedOff(BLUE);
+    LedOff(YELLOW);
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(u8Counter,au8Message);
+  }
+  if(u8Counter==LINE1_END_ADDR)
+  {
+    u8Counter=LINE1_START_ADDR;
+  } 
+ /*Make your name move*/ 
 } /* end UserApp1SM_Idle() */
     
 #if 0
