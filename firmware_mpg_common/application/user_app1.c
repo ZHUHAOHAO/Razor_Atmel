@@ -138,66 +138,107 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u8 u8Counter=LINE1_START_ADDR;
-  static u8 u8Counter1=0;
-  u8 au8Message[]="zhuhao";
-  u8Counter1++;
-  if(IsButtonPressed(BUTTON0)||IsButtonPressed(BUTTON1)||IsButtonPressed(BUTTON2)||IsButtonPressed(BUTTON3))
-   {
-     PWMAudioSetFrequency(BUZZER1,262);
-     PWMAudioOn(BUZZER1);
-   }
-  else
-   {
-     PWMAudioOff(BUZZER1);
-   }
-  /*if any button pressed,the buzzer will be on*/
-  if(WasButtonPressed(BUTTON0))
-   {
-    ButtonAcknowledge(BUTTON0);
-    LedOn(LCD_RED);
-   }
-  if(WasButtonPressed(BUTTON1))
-   {
-    ButtonAcknowledge(BUTTON1);
-    LedOn(LCD_BLUE);
-   }
-  
-  if(WasButtonPressed(BUTTON2))
-   {
-    ButtonAcknowledge(BUTTON2);
-    LedOn(LCD_GREEN);
-   }
-  if(WasButtonPressed(BUTTON3))
-   {
-    ButtonAcknowledge(BUTTON3);
-    LedOff(LCD_RED);
-    LedOff(LCD_BLUE);
-    LedOff(LCD_GREEN);
-   }
- /*Pressing the button and the LCD will change it's color*/
-  if(u8Counter1==100)
-  {
-    LedOn(RED);
-    LedOn(WHITE);
-    LedOn(BLUE);
-    LedOn(YELLOW);
-  }
-  if(u8Counter1==250)
-  {
-    u8Counter1=0;
-    u8Counter++;
-    LedOff(RED);
-    LedOff(WHITE);
-    LedOff(BLUE);
-    LedOff(YELLOW);
-    LCDCommand(LCD_CLEAR_CMD);
-    LCDMessage(u8Counter,au8Message);
-  }
-  if(u8Counter==LINE1_END_ADDR)
-  {
-    u8Counter=LINE1_START_ADDR;
+  static u8 u8Counter=LINE1_START_ADDR; 
+  static u8 u8Counter1=0; 
+  static u8 u8Counter2=0;
+  u8 au8Message[]="group2"; 
+  u8Counter1++; 
+  static bool bJudge=TRUE;
+  static bool bJudge1=TRUE;
+  u8 u8Index;
+
+  if(IsButtonPressed(BUTTON0)||IsButtonPressed(BUTTON1)||IsButtonPressed(BUTTON2)||IsButtonPressed(BUTTON3)) 
+   { 
+     PWMAudioSetFrequency(BUZZER1,262); 
+     PWMAudioOn(BUZZER1); 
+   } 
+  else 
+   {  
+     PWMAudioOff(BUZZER1); 
+   } 
+  /*if any button pressed,the buzzer will be on*/ 
+  if(WasButtonPressed(BUTTON0)) 
+  { 
+    ButtonAcknowledge(BUTTON0); 
+    LedOn(LCD_RED); 
+   } 
+  if(WasButtonPressed(BUTTON1)) 
+   { 
+    ButtonAcknowledge(BUTTON1); 
+    LedOn(LCD_BLUE); 
+   } 
+  if(WasButtonPressed(BUTTON2)) 
+   { 
+     ButtonAcknowledge(BUTTON2); 
+     LedOn(LCD_GREEN); 
+   } 
+  if(WasButtonPressed(BUTTON3)) 
+   { 
+    ButtonAcknowledge(BUTTON3); 
+    LedOff(LCD_RED); 
+    LedOff(LCD_BLUE); 
+    LedOff(LCD_GREEN); 
+   } 
+  /*Pressing the button and the LCD will change it's color*/ 
+  if(u8Counter1==100) 
+  { 
+    LedOn(RED); 
+    LedOn(WHITE); 
+    LedOn(BLUE); 
+    LedOn(YELLOW); 
   } 
+  if(u8Counter1==200) 
+  { 
+    u8Counter1=0; 
+    u8Counter++; 
+    LedOff(RED); 
+    LedOff(WHITE); 
+    LedOff(BLUE); 
+    LedOff(YELLOW); 
+    LCDCommand(LCD_CLEAR_CMD); 
+    for(u8Index=0;u8Index<sizeof(au8Message)-1;u8Index++)
+    {
+     if(u8Counter+u8Index==LINE1_END_ADDR+1)
+     {
+       bJudge=FALSE;
+     }
+     if(u8Counter+u8Index==LINE2_END_ADDR+1)
+     {
+       bJudge=FALSE;
+       bJudge1=FALSE;
+     }
+     if(!bJudge)
+     {
+        if(!bJudge1)
+        {
+         u8Counter2=u8Counter+u8Index-LINE2_END_ADDR;       
+         LCDMessage(LINE1_START_ADDR+u8Counter2,&au8Message[u8Index]);
+        } 
+        else
+        {
+         u8Counter2=u8Counter+u8Index-LINE1_END_ADDR;       
+         LCDMessage(LINE2_START_ADDR+u8Counter2,&au8Message[u8Index]);
+        }
+     }
+     else
+     {
+       LCDMessage(u8Counter+u8Index,&au8Message[u8Index]);
+     }
+     if(u8Index==sizeof(au8Message)-2)
+     {
+       bJudge=TRUE;
+       bJudge1=TRUE;
+     }
+    }
+  } 
+  if(u8Counter==LINE1_END_ADDR) 
+  { 
+    u8Counter=LINE2_START_ADDR; 
+  }   
+  if(u8Counter==LINE2_END_ADDR) 
+  { 
+    u8Counter=LINE1_START_ADDR; 
+  }
  /*Make your name move*/ 
 } /* end UserApp1SM_Idle() */
     
