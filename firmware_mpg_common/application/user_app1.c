@@ -87,7 +87,7 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
-  
+
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -134,6 +134,50 @@ State Machine Function Definitions
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
+static void UserApp1_State1(void)
+  {
+   LedOff(GREEN);
+   LedOff(YELLOW);
+   LedOff(ORANGE);
+   LedOff(RED);
+   LedOff(LCD_RED);
+   LedOff(LCD_GREEN);
+   LedOff(LCD_BLUE);
+   DebugPrintf("Entering state 1\n\r");
+   LCDCommand(LCD_CLEAR_CMD);
+   LCDMessage(LINE1_START_ADDR,"STATE 1");
+   LedOn(WHITE);
+   LedOn(PURPLE);
+   LedOn(BLUE);
+   LedOn(CYAN);
+   LedOn(LCD_RED);
+   LedOn(LCD_BLUE);
+   PWMAudioOff(BUZZER1); 
+   UserApp1_StateMachine = UserApp1SM_Idle;
+  }
+/*stage 1*/
+static void UserApp1_State2(void)
+  {
+   LedOff(WHITE);
+   LedOff(PURPLE);
+   LedOff(BLUE);
+   LedOff(CYAN);
+   LedOff(LCD_RED);
+   LedOff(LCD_GREEN);
+   LedOff(LCD_BLUE);
+   DebugPrintf("Entering state 2\n\r");
+   LCDMessage(LINE1_START_ADDR,"STATE 2");
+   LedBlink(GREEN,LED_1HZ);
+   LedBlink(YELLOW,LED_2HZ);
+   LedBlink(ORANGE,LED_4HZ);
+   LedBlink(RED,LED_8HZ);
+   LedPWM(LCD_GREEN,LED_PWM_25); 
+   LedPWM(LCD_RED,LED_PWM_70);
+   LedPWM(LCD_BLUE,LED_PWM_5);
+   PWMAudioSetFrequency(BUZZER1, 200);
+   UserApp1_StateMachine = UserApp1SM_Idle;
+  }  
+/*stage 2*/
 static void UserApp1SM_Idle(void)
 {
  u8 au8Value[2]={0,0};
@@ -145,7 +189,8 @@ static void UserApp1SM_Idle(void)
  static bool bBuzzer=TRUE;
  static bool bJudge=TRUE;
  static u32 u32Counter=0;
-  
+ 
+ 
  DebugScanf(au8Value);
  if(au8Value[0]!=0)
  {   
@@ -204,57 +249,17 @@ static void UserApp1SM_Idle(void)
  /*Judge the button and go to the right stage*/
  if(bState1==TRUE)
  {
-   LedOff(WHITE);
-   LedOff(PURPLE);
-   LedOff(BLUE);
-   LedOff(CYAN);
-   LedOff(GREEN);
-   LedOff(YELLOW);
-   LedOff(ORANGE);
-   LedOff(RED);
-   LedOff(LCD_RED);
-   LedOff(LCD_GREEN);
-   LedOff(LCD_BLUE);
-   DebugPrintf("Entering state 1\n\r");
-   LCDCommand(LCD_CLEAR_CMD);
-   LCDMessage(LINE1_START_ADDR,"STATE 1");
-   LedOn(WHITE);
-   LedOn(PURPLE);
-   LedOn(BLUE);
-   LedOn(CYAN);
-   LedOn(LCD_RED);
-   LedOn(LCD_BLUE);
-   PWMAudioOff(BUZZER1); 
+   UserApp1_StateMachine = UserApp1_State1;
    u32Counter=0;
    bBuzzer=TRUE;
  }
- /*when stage 1 was chosen,leds will be turn on */
+ /*when stage 1 was chosen,UserApp1_State1 will work */
  if(bState2==TRUE)
  {
+   UserApp1_StateMachine = UserApp1_State2;
    bBuzzer=FALSE;
-   LedOff(WHITE);
-   LedOff(PURPLE);
-   LedOff(BLUE);
-   LedOff(CYAN);
-   LedOff(GREEN);
-   LedOff(YELLOW);
-   LedOff(ORANGE);
-   LedOff(RED);
-   LedOff(LCD_RED);
-   LedOff(LCD_GREEN);
-   LedOff(LCD_BLUE);
-   DebugPrintf("Entering state 2\n\r");
-   LCDMessage(LINE1_START_ADDR,"STATE 2");
-   LedBlink(GREEN,LED_1HZ);
-   LedBlink(YELLOW,LED_2HZ);
-   LedBlink(ORANGE,LED_4HZ);
-   LedBlink(RED,LED_8HZ);
-   LedPWM(LCD_GREEN,LED_PWM_25); 
-   LedPWM(LCD_RED,LED_PWM_70);
-   LedPWM(LCD_BLUE,LED_PWM_5);
-   PWMAudioSetFrequency(BUZZER1, 200);
  }
- /*when stage 1 was chosen,leds will be turn on */
+ /*when stage 2 was chosen,UserApp1_State2 will work */
  if(bBuzzer==FALSE)
  {
    if(bJudge==TRUE)
@@ -277,11 +282,13 @@ static void UserApp1SM_Idle(void)
    u32Counter++;
  }
  /*the buzzer will be turn on when stage 2 was turned on*/
+ 
 } /* end UserApp1SM_Idle() */
-    
+  
 #if 0
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
+
 static void UserApp1SM_Error(void)          
 {
   
