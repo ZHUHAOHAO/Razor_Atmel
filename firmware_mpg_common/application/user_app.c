@@ -169,34 +169,19 @@ State Machine Function Definitions
 /* Wait for a message to be queued */
 static void UserAppSM_Idle(void)
 {
-  static u8 au8TestMessage[] = {0, 0, 0, 0, 0xA5, 0, 0, 0};
+  static u8 au8TestMessage[] = {0, 0, 0, 0, 0xFF, 0, 0, 0};
+  u8 u8LastState=0;
+  static u8 au8FailedNumber[] = {0, 0, 0};
+  static u8 au8TotalNumber[] = {0, 0, 0};
+    
   u8 au8DataContent[] = "xxxxxxxxxxxxxxxx";
+  u8 au8DataContent1[] = "xxxxxx";
+  u8 au8DataContent2[] = "xxxxxx"; 
   
-  /* Check all the buttons and update au8TestMessage according to the button state */ 
-  au8TestMessage[0] = 0x00;
-  if( IsButtonPressed(BUTTON0) )
-  {
-    au8TestMessage[0] = 0xff;
-  }
-  
-  au8TestMessage[1] = 0x00;
-  if( IsButtonPressed(BUTTON1) )
-  {
-    au8TestMessage[1] = 0xff;
-  }
+  au8TestMessage[0] = 0x5B;
 
 #ifdef MPG1
-  au8TestMessage[2] = 0x00;
-  if( IsButtonPressed(BUTTON2) )
-  {
-    au8TestMessage[2] = 0xff;
-  }
-
-  au8TestMessage[3] = 0x00;
-  if( IsButtonPressed(BUTTON3) )
-  {
-    au8TestMessage[3] = 0xff;
-  }
+  
 #endif /* MPG1 */
   
   if( AntReadData() )
@@ -231,12 +216,54 @@ static void UserAppSM_Idle(void)
           au8TestMessage[5]++;
         }
       }
-      AntQueueBroadcastMessage(au8TestMessage);
+     /*If the message missed, we will update the number of it*/
+      
+      u8LastState = G_au8AntApiCurrentData[ANT_TICK_MSG_EVENT_CODE_INDEX];
+      if(u8LastState == EVENT_TRANSFER_TX_FAILED)
+      {
+        au8TestMessage[3]++;
+        if(au8TestMessage[3] == 0)
+        {
+          au8TestMessage[2]++;
+          if(au8TestMessage[2] == 0)
+          {
+            au8TestMessage[1]++;
+          }
+        }         
+      }
+      
+     /*display the missed message number and the total number on the LCD*/      
+      au8FailedNumber[0] = au8TestMessage[1];
+      au8FailedNumber[1] = au8TestMessage[2];
+      au8FailedNumber[2] = au8TestMessage[3];
+      
+      au8TotalNumber[0] = au8TestMessage[5];
+      au8TotalNumber[1] = au8TestMessage[6];
+      au8TotalNumber[2] = au8TestMessage[7];
+      
+      for(u8 i = 0; i < 3; i++)
+      {
+        au8DataContent1[2 * i]     = HexToASCIICharUpper(au8FailedNumber[i] / 16);
+        au8DataContent1[2 * i + 1] = HexToASCIICharUpper(au8FailedNumber[i] % 16);
+      } 
+      
+      for(u8 i = 0; i < 3; i++)
+      {
+        au8DataContent2[2 * i]     = HexToASCIICharUpper(au8TotalNumber[i] / 16);
+        au8DataContent2[2 * i + 1] = HexToASCIICharUpper(au8TotalNumber[i] % 16);
+      } 
+      
+      LCDMessage(LINE2_START_ADDR, au8DataContent1);
+      LCDMessage(LINE2_START_ADDR+10, au8DataContent2);
+            
+      AntQueueAcknowledgedMessage(au8TestMessage);
+ 
     }
   } /* end AntReadData() */
   
+ 
 } /* end UserAppSM_Idle() */
-
+/* if(u8LastState != G_au8AntApiCurrentData[ANT_TICK_MSG_EVENT_CODE_INDEX])*/
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
