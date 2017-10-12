@@ -263,7 +263,6 @@ static void UserAppSM_Idle(void)
   
  
 } /* end UserAppSM_Idle() */
-/* if(u8LastState != G_au8AntApiCurrentData[ANT_TICK_MSG_EVENT_CODE_INDEX])*/
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
