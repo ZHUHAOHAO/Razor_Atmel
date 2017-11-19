@@ -434,9 +434,19 @@ static void UserApp1SM_ChannelOpen(void)
     {
       if(bBuzzer)
       {
+        LedOff(ORANGE);
+        LedOff(YELLOW);
+        LedOff(GREEN);
+        LedOff(CYAN);
+        LedOff(BLUE);
+        LedOff(PURPLE);
+        LedOff(WHITE);
+        LedOff(GREEN);
+        LedOff(YELLOW);
         PWMAudioSetFrequency(BUZZER1,262);
         PWMAudioOn(BUZZER1); 
         bBuzzer = FALSE;
+        u32Counter2 = 0;
       }
       u32Counter2++;
       if(u32Counter2 == 2000)
@@ -447,10 +457,11 @@ static void UserApp1SM_ChannelOpen(void)
       }
       if(bTime)
       {       
+        PWMAudioOff(BUZZER1);
         u32Counter1++;
         if(bStart)
         {
-          PWMAudioOff(BUZZER1);
+          //PWMAudioOff(BUZZER1);
           LCDCommand(LCD_CLEAR_CMD);
           LCDMessage(LINE1_START_ADDR, "Seeker");
           LCDMessage(LINE2_START_ADDR, au8Time);
@@ -490,6 +501,15 @@ static void UserApp1SM_ChannelOpen(void)
   {
     if(bHider)
     {
+      LedOff(ORANGE);
+      LedOff(YELLOW);
+      LedOff(GREEN);
+      LedOff(CYAN);
+      LedOff(BLUE);
+      LedOff(PURPLE);
+      LedOff(WHITE);
+      LedOff(GREEN);
+      LedOff(YELLOW);
       u32Counter++;
       PWMAudioSetFrequency(BUZZER1,262);
       PWMAudioOn(BUZZER1);
@@ -529,12 +549,16 @@ static void UserApp1SM_ChannelOpen(void)
       if(s8Rssichannel0 < -95)
       {
         LedOn(WHITE);
+        PWMAudioSetFrequency(BUZZER1,50);
+        PWMAudioOn(BUZZER1);
       }
       
       if(s8Rssichannel0 >= -95 && s8Rssichannel0 < -90)
       {
         LedOn(WHITE);
         LedOn(PURPLE);
+        PWMAudioSetFrequency(BUZZER1,120);
+        PWMAudioOn(BUZZER1);
       }
       
       if(s8Rssichannel0 >= -90 && s8Rssichannel0 < -85)
@@ -542,6 +566,8 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(WHITE);
         LedOn(PURPLE);
         LedOn(BLUE);
+        PWMAudioSetFrequency(BUZZER1,190);
+        PWMAudioOn(BUZZER1);
       }
       
       if(s8Rssichannel0 >= -85 && s8Rssichannel0 < -80)
@@ -558,7 +584,9 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(PURPLE);
         LedOn(BLUE);
         LedOn(CYAN);
-        LedOn(GREEN);    
+        LedOn(GREEN); 
+        PWMAudioSetFrequency(BUZZER1,260);
+        PWMAudioOn(BUZZER1);
       }
       
       if(s8Rssichannel0 >= -75 && s8Rssichannel0 < -70)
@@ -569,6 +597,8 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(CYAN);
         LedOn(GREEN);  
         LedOn(YELLOW);
+        PWMAudioSetFrequency(BUZZER1,330);
+        PWMAudioOn(BUZZER1);
       }
       
       if(s8Rssichannel0 >= -70 && s8Rssichannel0 < -60)
@@ -580,6 +610,8 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(GREEN);
         LedOn(YELLOW);
         LedOn(ORANGE);
+        PWMAudioSetFrequency(BUZZER1,380);
+        PWMAudioOn(BUZZER1);
       }
       
       if(s8Rssichannel0 >= -60 && s8Rssichannel0 <= -50)
@@ -592,6 +624,7 @@ static void UserApp1SM_ChannelOpen(void)
         LedOn(YELLOW);
         LedOn(ORANGE);
         LedOn(RED);
+        PWMAudioOff(BUZZER1);
         /*check if the command from the seeker or the hider*/
         if(bFinish)
         {       
@@ -766,17 +799,25 @@ static void UserApp1SM_WaitChannelClose(void)
   /* Monitor the channel status to check if channel is closed */
   if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_CLOSED)
   {
-
     UserApp1_StateMachine = UserApp1SM_Idle;
   }
   
   /* Check for timeout */
   if( IsTimeUp(&UserApp1_u32Timeout, TIMEOUT_VALUE) )
   {
-#ifdef MPG1
+#ifdef MPG1   
+    LedOff(ORANGE);
+    LedOff(YELLOW);
+    LedOff(GREEN);
+    LedOff(CYAN);
+    LedOff(BLUE);
+    LedOff(PURPLE);
+    LedOff(WHITE);
     LedOff(GREEN);
     LedOff(YELLOW);
     LedBlink(RED, LED_4HZ);
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "GAME OVER!");
 #endif /* MPG1 */
 
 #ifdef MPG2
