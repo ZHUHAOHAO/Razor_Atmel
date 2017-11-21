@@ -387,9 +387,9 @@ static void UserApp1SM_ChannelOpen(void)
   static u32 u32Counter2=0;
   static u32 u32Counter1=0;
   static u32 u32Counter=0;
-  static u8 u8Index = 10;
+  static u8 u8Index = 3;
   static bool bState = FALSE;
-  static u8 au8Time[] = "10";
+  static u8 au8Time[] = "03";
   static bool bSeeker = FALSE;
   static bool bHider = FALSE;
   static bool bFinish = FALSE;
