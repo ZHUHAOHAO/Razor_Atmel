@@ -136,10 +136,19 @@ void UserApp1Initialize(void)
   sAntSetupData.AntTxPower          = ANT_TX_POWER_USERAPP;
 
   sAntSetupData.AntNetwork = ANT_NETWORK_DEFAULT;
-  for(u8 i = 0; i < ANT_NETWORK_NUMBER_BYTES; i++)
+  /*for(u8 i = 0; i < ANT_NETWORK_NUMBER_BYTES; i++)
   {
     sAntSetupData.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
-  }
+  }*/
+  
+  sAntSetupData.AntNetworkKey[0] = 0xB9;
+  sAntSetupData.AntNetworkKey[1] = 0xA5;
+  sAntSetupData.AntNetworkKey[2] = 0x21;
+  sAntSetupData.AntNetworkKey[3] = 0xFB;
+  sAntSetupData.AntNetworkKey[4] = 0xBD;
+  sAntSetupData.AntNetworkKey[5] = 0x72;
+  sAntSetupData.AntNetworkKey[6] = 0xC3;
+  sAntSetupData.AntNetworkKey[7] = 0x45;
     
   /* If good initialization, set state to Idle */
   if( AntAssignChannel(&sAntSetupData) )
@@ -302,7 +311,6 @@ static void UserApp1SM_WaitChannelOpen(void)
     
 } /* end UserApp1SM_WaitChannelOpen() */
 
-
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Channel is open, so monitor data */
 static void UserApp1SM_ChannelOpen(void)
@@ -312,8 +320,27 @@ static void UserApp1SM_ChannelOpen(void)
   static u8 au8DataContent[] = "xxxxxxxxxxxxxxxx";
   static u8 au8LastAntData[ANT_APPLICATION_MESSAGE_BYTES] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   static u8 au8TestMessage[] = {0, 0, 0, 0, 0xA5, 0, 0, 0};
+  static u8 au8HeartBeat[] = "000";
+  static u8 au8MaxBeat[] = "000";
+  static u8 au8MinBeat[] = "000";
+  static u8 u8Number = 0;
+  static u8 u8MaxNumber = 0;
+  static u8 u8HeartRateCounter = 0;
+  static u8 u8MinNumber = 255;
+  static u32 u32Counter = 0;
+  static u8 u8DotNumber = 0;
+  u8 au8HeartRatePatten[50];
+  static u8 u8Index=0;
   bool bGotNewData;
-
+  static bool bWelcome = TRUE;
+  
+  if(bWelcome)
+  {
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "HR:        MAX:");
+    LCDMessage(LINE2_START_ADDR+11, "MIN:");
+    bWelcome = FALSE;
+  }
   /* Check for BUTTON0 to close channel */
   if(WasButtonPressed(BUTTON0))
   {
@@ -360,26 +387,108 @@ static void UserApp1SM_ChannelOpen(void)
         if(G_au8AntApiCurrentMessageBytes[i] != au8LastAntData[i])
         {
           bGotNewData = TRUE;
+          u32Counter++;
           au8LastAntData[i] = G_au8AntApiCurrentMessageBytes[i];
-
-          au8DataContent[2 * i]     = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] / 16);
-          au8DataContent[2 * i + 1] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] % 16); 
+         /*Get the HR */ 
+          u8Number = G_au8AntApiCurrentMessageBytes[7] /100;
+                
+          au8HeartBeat[0] = u8Number +'0';     
+          au8HeartBeat[1] =  (G_au8AntApiCurrentMessageBytes[7] / 10 - u8Number * 10)+'0';
+          au8HeartBeat[2] =  (G_au8AntApiCurrentMessageBytes[7] % 10)+'0';
+          
+          /*when your HR changes,the buzzer will also change */
+          if(G_au8AntApiCurrentMessageBytes[7]>60 && G_au8AntApiCurrentMessageBytes[7]<80)
+          {
+            PWMAudioSetFrequency(BUZZER1,200);
+            PWMAudioOn(BUZZER1);
+          }
+          
+          if(G_au8AntApiCurrentMessageBytes[7]>=80 && G_au8AntApiCurrentMessageBytes[7]<100)
+          {
+            PWMAudioSetFrequency(BUZZER1,250);
+            PWMAudioOn(BUZZER1);
+          }
+          
+          if(G_au8AntApiCurrentMessageBytes[7]>=100 && G_au8AntApiCurrentMessageBytes[7]<120)
+          {
+            PWMAudioSetFrequency(BUZZER1,300);
+            PWMAudioOn(BUZZER1);
+          }
+          
+          if(G_au8AntApiCurrentMessageBytes[7]>=120 && G_au8AntApiCurrentMessageBytes[7]<150)
+          {
+            PWMAudioSetFrequency(BUZZER1,350);
+            PWMAudioOn(BUZZER1);
+          }
+          
+          /*when your HR is too high or too slow,the led will turn on the red or the white*/
+          if(G_au8AntApiCurrentMessageBytes[7]>150)
+          {
+            LedOn(RED);
+            PWMAudioOff(BUZZER1);
+          }
+          else
+          {
+            LedOff(RED);
+          }
+          
+          if(G_au8AntApiCurrentMessageBytes[7]<60)
+          {
+            LedOn(WHITE);
+            PWMAudioOff(BUZZER1);
+          }
+          else
+          {
+            LedOff(WHITE);
+          }
+          /*Get the max HR*/
+          if(u8MaxNumber < G_au8AntApiCurrentMessageBytes[7])
+          {
+            u8MaxNumber = G_au8AntApiCurrentMessageBytes[7];                   
+            u8Number = u8MaxNumber / 100;
+            au8MaxBeat[0] = u8Number +'0';     
+            au8MaxBeat[1] =  (G_au8AntApiCurrentMessageBytes[7] / 10 - u8Number * 10)+'0';
+            au8MaxBeat[2] =  (G_au8AntApiCurrentMessageBytes[7] % 10)+'0';
+            LCDMessage(LINE1_START_ADDR+16, au8MaxBeat);
+          }
+          /*Get the min HR*/
+          if(u8MinNumber > G_au8AntApiCurrentMessageBytes[7])
+          {
+            u8MinNumber = G_au8AntApiCurrentMessageBytes[7];                   
+            u8Number = u8MinNumber / 100;
+            au8MinBeat[0] = u8Number +'0';     
+            au8MinBeat[1] =  (G_au8AntApiCurrentMessageBytes[7] / 10 - u8Number * 10)+'0';
+            au8MinBeat[2] =  (G_au8AntApiCurrentMessageBytes[7] % 10)+'0';
+            LCDMessage(LINE2_START_ADDR+16, au8MinBeat);
+          }
+         
         }
       }
       
       if(bGotNewData)
       {
+        
         /* We got new data: show on LCD */
 #ifdef MPG1
-        LCDClearChars(LINE2_START_ADDR, 20); 
-        LCDMessage(LINE2_START_ADDR, au8DataContent); 
+        /*The lcd will show the HR,MAXHR,MINHR.and the debug will give you cardiogram*/
+        LCDMessage(LINE1_START_ADDR+4, au8HeartBeat);
+        u8HeartRateCounter = G_au8AntApiCurrentMessageBytes[7]/6;
+        for(u8Index=0 ; u8Index < u8HeartRateCounter ; u8Index++)
+        {
+          au8HeartRatePatten[u8Index] = '|';
+          u8DotNumber++;
+        }
+        au8HeartRatePatten[u8DotNumber] = '\n';
+        au8HeartRatePatten[u8DotNumber+1] = '\r';
+        au8HeartRatePatten[u8DotNumber+2] = '\0';
+        u8DotNumber=0;
+        DebugPrintf(au8HeartRatePatten);      
 #endif /* MPG1 */    
     
 #ifdef MPG2
         PixelAddressType sStringLocation = {LCD_SMALL_FONT_LINE4, LCD_LEFT_MOST_COLUMN}; 
         LcdLoadString(au8DataContent, LCD_FONT_SMALL, &sStringLocation); 
 #endif /* MPG2 */
-
         /* Update our local message counter and send the message back */
         au8TestMessage[7]++;
         if(au8TestMessage[7] == 0)
